@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter)
 import tensorflow as tf
 import seaborn as sns
+from skimage import exposure
+
 
 
 # Function to plot bar charts
@@ -32,18 +34,20 @@ def bar_chart(data, variable, x_label, fontsize=10, rotation = 0):
 
 
 
-# Remove hair, resize, normalize (and adjust brightness/contrast) of images 
+# Preprocessing of images 
 def inicial_preproc(data: list, alpha=1.0, beta=0):
     
     preprocessed_images = []
 
     for img in data:
         
-        img_resized = cv2.resize(img, (71, 71))
+        img_resized = cv2.resize(img, (100, 50))
+
+        img_corrected = exposure.equalize_adapthist(img_resized, clip_limit=0.03)
 
         # img_adjusted = cv2.convertScaleAbs(img_resized, alpha=alpha, beta=beta)
 
-        img_normalized = np.array(img_resized) / 255.0  # Normalize to [0, 1] range
+        img_normalized = np.array(img_corrected) / 255.0  # Normalize to [0, 1] range
         
         preprocessed_images.append(img_normalized)
 
@@ -211,4 +215,10 @@ def evaluate_model(X_test, y_test, model):
     print(f"Overall accuracy: {overall_accuracy:.2f}")
 
     return
+
+
+
+
+
+
 
